@@ -43,11 +43,12 @@
     .check input:checked::after{transform:scale(1)}
     .check span{line-height:1.5}
     .check:has(input:checked){ border-color:rgba(16,185,129,.6); box-shadow:0 0 0 4px rgba(16,185,129,.12) }
+
+    /* 結果は画像のみ表示 */
     .result{display:none; margin-top:12px}
-    .badge{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#fff; border:1px solid var(--line); margin:4px 6px 0 0; font-size:13px}
-    .summary{background:#fff; border:1px dashed var(--brand-300); border-radius:12px; padding:12px; white-space:pre-wrap; font-size:14px; line-height:1.7}
     .hero-img{margin-top:12px; border-radius:14px; border:1px solid var(--line); overflow:hidden}
     .hero-img img{width:100%; height:auto; display:block}
+
     .nav{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap}
     .btn{cursor:pointer; min-height:48px; padding:14px 18px; border-radius:12px; border:1px solid var(--line); background:#fff; font-weight:700; width:100%; position:relative; z-index:1}
     .btn.primary{background:linear-gradient(180deg,var(--brand),#c57f7f); color:#fff; border-color:#c57f7f}
@@ -57,7 +58,6 @@
     @media (min-width:640px){ #navBar .row{grid-template-columns:160px 1fr} }
     @media (min-width:960px){ .wrap{padding-bottom:160px} }
   </style>
-  <!-- （LIFFは遅延読込に変更：ここでは読み込まない） -->
 </head>
 <body>
   <main class="wrap">
@@ -68,21 +68,18 @@
       <div class="stepper" id="stepper"></div>
       <div id="questionView"></div>
 
+      <!-- 結果は画像のみ -->
       <div class="result" id="resultView">
-        <h2>診断結果</h2>
-        <div id="typeBadge" class="badge"></div>
         <div class="hero-img" id="heroImg" aria-hidden="true"></div>
-        <div class="summary" id="summaryBox"></div>
         <div class="nav">
           <button class="btn" id="btnRestart">やり直す</button>
-          <button class="btn primary" id="btnShareLine">結果をLINEで送る</button>
-          <button class="btn" id="btnCopy">結果をコピー</button>
+          <button class="btn primary" id="btnShareLine">結果画像をLINEで送る</button>
         </div>
       </div>
     </section>
   </main>
 
-    <!-- 下部固定ナビ -->
+  <!-- 下部固定ナビ -->
   <nav id="navBar" aria-label="操作ナビ">
     <div class="row" id="navBtns">
       <button class="btn" id="btnPrev">戻る</button>
@@ -99,12 +96,6 @@
       AUTUMN: 'https://www.dropbox.com/scl/fi/d4e2z1y2z1s0fzohkrz9c/3.png?rlkey=lcg5lv3z6dcqxi16edcdibgsi&dl=1',
       WINTER: 'https://www.dropbox.com/scl/fi/m1iqpihu2dr8q9b4hnru4/1.png?rlkey=ldem7h7sai3fajnw6xfkaz096&dl=1',
     };
-    const RESULT_TEXT = {
-      SPRING: 'スプリング（イエベ春）\n・明るく澄んだ色、黄みのある軽やかな色が得意\n・ゴールド、コーラル、アプリコット、ミント等\n・メイクは艶と透明感、黄み寄りのベージュ系が◎',
-      SUMMER : 'サマー（ブルベ夏）\n・青みを含んだやわらかい色、くすみパステルが得意\n・ローズ、ラベンダー、ブルーグレー等\n・メイクはソフトマット、ローズ〜モーブ系が◎',
-      AUTUMN: 'オータム（イエベ秋）\n・深みと温かみのある色、低明度・低彩度が得意\n・テラコッタ、オリーブ、マスタード等\n・メイクはマット質感、ブラウン・オレンジ系が◎',
-      WINTER : 'ウィンター（ブルベ冬）\n・はっきり高彩度＆高コントラストが得意\n・ビビッドピンク、ロイヤルブルー、モノトーン等\n・メイクは艶×コントラスト、青みピンクやボルドーが◎',
-    };
 
     const SECTIONS = [
       { id:'skin', title:'Ⅰ 肌の色・印象は？',
@@ -117,34 +108,34 @@
       },
       { id:'beigegray', title:'Ⅱ ベージュとグレーの洋服で得意なのは？',
         letters:{
-          A:{ img:'https://www.dropbox.com/scl/fi/f45scwhiw1joxcowsg22g/1.png?rlkey=ohm9bn5end0hzocu3ctman2o7&dl=1', items:['ダークグレーで印象がはっきり'] },
-          B:{ img:'https://www.dropbox.com/scl/fi/0roqzj9g4cadbc7d79c4s/2.png?rlkey=gp833m25rql6cavmt3i9a3vnw&dl=1', items:['明るいグレーで肌がキレイ'] },
-          C:{ img:'https://www.dropbox.com/scl/fi/6gn3quc7n0tuepa3yjtht/3.png?rlkey=r94s81ov3cxq93o4n0q8j9ujo&dl=1', items:['落ち着いたベージュでも老けない'] },
-          D:{ img:'https://www.dropbox.com/scl/fi/88bit1bexy12jwjy6vtz1/4.png?rlkey=m0j9ykut4940c7b85o2qmr2c1&dl=1', items:['明るいベージュで顔色が良い'] }
+          A:{ img:'https://www.dropbox.com/scl/fi/f45scwhiw1joxcowsg22g/1.png?rlkey=ohm9bn5end0hzocu3ctman2o7&dl=1', items:['ダークなグレー（顔の印象をはっきりと見せる'] },
+          B:{ img:'https://www.dropbox.com/scl/fi/0roqzj9g4cadbc7d79c4s/2.png?rlkey=gp833m25rql6cavmt3i9a3vnw&dl=1', items:['明るいグレーや青みの強いグレー（肌がキレイに見える）'] },
+          C:{ img:'https://www.dropbox.com/scl/fi/6gn3quc7n0tuepa3yjtht/3.png?rlkey=r94s81ov3cxq93o4n0q8j9ujo&dl=1', items:['落ち着いたベージュやブラウン（地味になったり老けたりしない）'] },
+          D:{ img:'https://www.dropbox.com/scl/fi/88bit1bexy12jwjy6vtz1/4.png?rlkey=m0j9ykut4940c7b85o2qmr2c1&dl=1', items:['明るいベージュ（顔色が良く見える）'] }
         }
       },
       { id:'eyes', title:'Ⅲ 瞳の色・印象は？',
         letters:{
-          A:{ img:'https://www.dropbox.com/scl/fi/0usq54wcnquoxgk34kcp1/1.jpg?rlkey=1am5x4y7igg2sur5sfkd98p8d&dl=1', items:['黒やダークブラウン','コントラストが強い'] },
-          B:{ img:'https://www.dropbox.com/scl/fi/9gtol6hril375v7tc9rwk/2.jpg?rlkey=81p9ej8dwhvc8g41r6bqdf259&dl=1', items:['ソフトブラック','やさしい印象'] },
-          C:{ img:'https://www.dropbox.com/scl/fi/hei8cgewx19dhlyqcky2c/3.jpg?rlkey=wc1crb3lzazmtxhgmencjpjxm&dl=1', items:['ダークブラウン','落ち着いた印象'] },
-          D:{ img:'https://www.dropbox.com/scl/fi/c0zzki09knylcuuruc9q0/4.jpg?rlkey=485y6gnvfm42na79txf9z5ew2&dl=1', items:['明るいブラウン','キラキラした印象'] }
+          A:{ img:'https://www.dropbox.com/scl/fi/0usq54wcnquoxgk34kcp1/1.jpg?rlkey=1am5x4y7igg2sur5sfkd98p8d&dl=1', items:['瞳はブラックやダークブラウン','白目と黒目のコントラストがはっきりしている','キリっとした印象の目'] },
+          B:{ img:'https://www.dropbox.com/scl/fi/9gtol6hril375v7tc9rwk/2.jpg?rlkey=81p9ej8dwhvc8g41r6bqdf259&dl=1', items:['瞳はソフトなブラックやソフトなブラウン','白目と黒目のコントラストは強くない','落ち着いた印象の目'] },
+          C:{ img:'https://www.dropbox.com/scl/fi/hei8cgewx19dhlyqcky2c/3.jpg?rlkey=wc1crb3lzazmtxhgmencjpjxm&dl=1', items:['瞳はダークブラウンやブラック','白目はやや黄みが買っている','落ち着いた印象の目'] },
+          D:{ img:'https://www.dropbox.com/scl/fi/c0zzki09knylcuuruc9q0/4.jpg?rlkey=485y6gnvfm42na79txf9z5ew2&dl=1', items:['瞳は明るいブラウンやソフトなブラック','白目と黒目の印象がはっきりしている','キラキラとした印象の目'] }
         }
       },
       { id:'accessories', title:'Ⅳ 肌になじむアクセサリーは？',
         letters:{
-          A:{ img:'https://www.dropbox.com/scl/fi/w248luwyl0owlu9ydv81j/1.jpg?rlkey=ie9b5nyek4x7yjecy3geypy78&dl=1', items:['ツヤのあるシルバー'] },
-          B:{ img:'https://www.dropbox.com/scl/fi/dz3jnf10yk449k43mx1ww/2.jpg?rlkey=p5iz8q6a84v766lgvwr1q3z1g&dl=1', items:['優しい光沢のシルバー','パールやクリスタル'] },
-          C:{ img:'https://www.dropbox.com/scl/fi/8s2y5regts7if6uyevy4g/3.jpg?rlkey=zg6b21xvth3j66zioymq5v83u&dl=1', items:['落ち着いたゴールド','大ぶりのデザイン'] },
-          D:{ img:'https://www.dropbox.com/scl/fi/ugpsqc1r4qwd12t4jkovk/4.jpg?rlkey=0k51y59rnueildllr4fvmh1pl&dl=1', items:['明るいゴールド','細身で華やか'] }
+          A:{ img:'https://www.dropbox.com/scl/fi/w248luwyl0owlu9ydv81j/1.jpg?rlkey=ie9b5nyek4x7yjecy3geypy78&dl=1', items:['ツヤのあるシルバーやプラチナ','ダイヤモンド、ブラックパール','キラキラと光を放つデザイン'] },
+          B:{ img:'https://www.dropbox.com/scl/fi/dz3jnf10yk449k43mx1ww/2.jpg?rlkey=p5iz8q6a84v766lgvwr1q3z1g&dl=1', items:['優しい光沢のシルバーやプラチナ','パール、クリスタル','細めのものや繊細なデザイン'] },
+          C:{ img:'https://www.dropbox.com/scl/fi/8s2y5regts7if6uyevy4g/3.jpg?rlkey=zg6b21xvth3j66zioymq5v83u&dl=1', items:['黄みの強いゴールド','マットなゴールドやブロンズ','重厚感がある大ぶりのデザイン'] },
+          D:{ img:'https://www.dropbox.com/scl/fi/ugpsqc1r4qwd12t4jkovk/4.jpg?rlkey=0k51y59rnueildllr4fvmh1pl&dl=1', items:['キラキラした明るいゴールド','イエローゴールド、ピンクゴールド','華奢で可愛らしいデザイン'] }
         }
       },
       { id:'hair', title:'Ⅴ 髪の色・質感は？',
         letters:{
-          A:{ img:'https://www.dropbox.com/scl/fi/fwu7w2ak26443gra3ls2z/1.jpg?rlkey=4k63kx81740etoc4lwg8kzoie&dl=1', items:['こげ茶〜黒','ツヤのある髪'] },
-          B:{ img:'https://www.dropbox.com/scl/fi/5e1mz1oa967zvylewz1lm/2.jpg?rlkey=2nflm6hqr11a79fxn2imysn21&dl=1', items:['こげ茶〜グレー寄り','ソフトな黒髪'] },
-          C:{ img:'https://www.dropbox.com/scl/fi/b1tzf8fd32guwl9ks9p5c/3.jpg?rlkey=bz12txiwppxk67akupele9pn6&dl=1', items:['やわらかブラウン','マット質感'] },
-          D:{ img:'https://www.dropbox.com/scl/fi/s0eaur7gilj0mzjdt730l/4.jpg?rlkey=bq6ttfksib5czszt7uv7oy70b&dl=1', items:['明るいブラウン','絹のようなツヤ'] }
+          A:{ img:'https://www.dropbox.com/scl/fi/fwu7w2ak26443gra3ls2z/1.jpg?rlkey=4k63kx81740etoc4lwg8kzoie&dl=1', items:['こげ茶〜黒','つやつやの黒髪'] },
+          B:{ img:'https://www.dropbox.com/scl/fi/5e1mz1oa967zvylewz1lm/2.jpg?rlkey=2nflm6hqr11a79fxn2imysn21&dl=1', items:['こげ茶〜グレーよりの黒','ソフトな黒髪'] },
+          C:{ img:'https://www.dropbox.com/scl/fi/b1tzf8fd32guwl9ks9p5c/3.jpg?rlkey=bz12txiwppxk67akupele9pn6&dl=1', items:['やわらかいブラウン～黒に近いブラウン','ややマットな質感'] },
+          D:{ img:'https://www.dropbox.com/scl/fi/s0eaur7gilj0mzjdt730l/4.jpg?rlkey=bq6ttfksib5czszt7uv7oy70b&dl=1', items:['明るいブラウン','絹糸のようなツヤがある'] }
         }
       }
     ];
@@ -167,9 +158,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       render();
-      // 最初は現在セクションのみ軽く先読み
       preloadSectionImages(state.step);
-      // 次セクションはアイドル時に
       if (SECTIONS[state.step+1]) { setTimeout(()=>preloadSectionImages(state.step+1), 300); }
     });
 
@@ -220,8 +209,6 @@
       updateNextBtnLabel();
       updateNextBtnState();
       toggleResult(false);
-
-      // iOS初回描画の安全策
       requestAnimationFrame(updateNextBtnState);
     }
 
@@ -261,10 +248,8 @@
       if (!sectionHasAnyChecked(state.step)) return;
       if (state.step < SECTIONS.length - 1){
         state.step++; render();
-        // 現在＋次の軽量先読み
         preloadSectionImages(state.step);
         if (SECTIONS[state.step+1]) { setTimeout(()=>preloadSectionImages(state.step+1), 200); }
-        // 最終手前に来たら結果画像をアイドル時に温める
         if (state.step >= SECTIONS.length - 2) { preloadResultImagesIdle(); }
       } else {
         const result = computeResult(); showResult(result);
@@ -276,18 +261,10 @@
       window.scrollTo({top:0, behavior:'smooth'});
     };
 
-    document.getElementById('btnCopy').onclick = () => {
-      const { season, letter, counts, summary } = lastResultCache || computeResult();
-      const text = buildShareText(season, letter, counts, summary);
-      navigator.clipboard.writeText(text).then(()=>alert('結果をコピーしました。')).catch(()=>alert('コピーに失敗しました。'));
-    };
-
-    /* ========= LIFF（遅延読込） ========= */
+    /* ========= LIFF（画像のみ送信） ========= */
     async function ensureLiffReady(){
-      if (!window.liff) {
-        await loadScript('https://static.line-scdn.net/liff/edge/2/sdk.js');
-      }
-      const LIFF_ID='2008350729-NwPdmMA7';
+      if (!window.liff) await loadScript('https://static.line-scdn.net/liff/edge/2/sdk.js');
+      const LIFF_ID='2008350729-NwPdmMA7'; // ←必要に応じて置き換え
       if (liff && !liff._initCalled && LIFF_ID){
         try{ await liff.init({ liffId: LIFF_ID }); }catch(e){}
       }
@@ -300,22 +277,22 @@
 
     document.getElementById('btnShareLine').onclick = async () => {
       await ensureLiffReady();
-      const { season, letter, counts, summary, image } = lastResultCache || computeResult();
-      const text = buildShareText(season, letter, counts, summary);
+      const { image } = lastResultCache || computeResult();
+      if (!image){ alert('画像が用意できませんでした。'); return; }
       try{
         if (window.liff?.isLoggedIn?.()) {
           if (liff.shareTargetPicker) {
-            await liff.shareTargetPicker([{ type:'text', text }, ...(image? [{type:'image', originalContentUrl:image, previewImageUrl:image}] : []) ]);
+            await liff.shareTargetPicker([{ type:'image', originalContentUrl:image, previewImageUrl:image }]);
           } else {
-            await liff.sendMessages([{ type:'text', text }]);
+            await liff.sendMessages([{ type:'image', originalContentUrl:image, previewImageUrl:image }]);
           }
-          alert('LINEに送信しました。');
+          alert('結果画像をLINEに送信しました。');
         } else if (window.liff){ await liff.login(); }
         else { alert('LINE連携（LIFF）が有効ではありません。liffIdの設定をご確認ください。'); }
       }catch(e){ console.error(e); alert('LINE送信でエラーが発生しました。'); }
     };
 
-    /* ========= 判定 ========= */
+    /* ========= 判定（画像のみ返す） ========= */
     function computeResult(){
       const letterCounts={A:0,B:0,C:0,D:0}, sectionByLetter={};
       for(const sec of SECTIONS){
@@ -336,44 +313,24 @@
         }
         candidate=best;
       }
-      const season=LETTER_TO_SEASON[candidate], summary=RESULT_TEXT[season], image=RESULT_IMAGES[season];
-      const result={letter:candidate, season, counts:{...letterCounts}, summary, image};
+      const season=LETTER_TO_SEASON[candidate], image=RESULT_IMAGES[season];
+      const result={letter:candidate, season, image};
       lastResultCache=result; return result;
     }
 
-    function showResult({ season, letter, counts, summary, image }){
-      document.getElementById('typeBadge').textContent = `${season}（${niceJa(season)}） / 判定レター: ${letter}`;
+    function showResult({ image }){
       const hero=document.getElementById('heroImg');
       if(image){
         const img=new Image(); img.decoding='async'; img.loading='eager';
         img.onload=()=>{ img.style.opacity='1'; };
         img.style.opacity='0'; img.style.transition='opacity .25s ease';
-        img.alt=`${niceJa(season)}のイメージ`; img.src=image;
+        img.alt='診断結果画像'; img.src=image;
         hero.innerHTML=''; hero.appendChild(img); hero.setAttribute('aria-hidden','false');
       }else{
         hero.innerHTML=''; hero.setAttribute('aria-hidden','true');
       }
-      document.getElementById('summaryBox').textContent = [
-        `A: ${counts.A} / B: ${counts.B} / C: ${counts.C} / D: ${counts.D}`,
-        ``,
-        summary
-      ].join('\n');
-
       toggleResult(true);
       renderStepper();
-    }
-
-    function niceJa(season){ return { SPRING:'イエベ春', SUMMER:'ブルベ夏', AUTUMN:'イエベ秋', WINTER:'ブルベ冬' }[season] || season; }
-    function buildShareText(season, letter, counts, summary){
-      return [
-        '【パーソナルカラー診断 結果】',
-        `${season}（${niceJa(season)}）／レター: ${letter}`,
-        `A:${counts.A} / B:${counts.B} / C:${counts.C} / D:${counts.D}`,
-        '',
-        summary,
-        '',
-        '※この結果は簡易診断です。参考としてご活用ください。'
-      ].join('\n');
     }
   </script>
 </body>

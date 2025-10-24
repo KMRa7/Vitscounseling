@@ -11,41 +11,88 @@
     :root{
       --bg:#f6f7fb; --panel:#fff; --ink:#0f172a; --muted:#64748b; --line:#e5e7eb;
       --brand:#df9b9b; --brand-100:#fff1f1; --brand-200:#ffe2e2; --brand-300:#f6c8c8;
+      --ok:#10b981;
       --radius:16px; --shadow:0 10px 30px rgba(15,23,42,.08);
+      --safe:env(safe-area-inset-bottom);
     }
     *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
-    body{margin:0; font-family:'Inter','Noto Sans JP',sans-serif; background:linear-gradient(180deg,var(--bg) 0%,#fff 100%); color:var(--ink)}
-    .wrap{max-width:860px; margin:0 auto; padding:20px 16px 120px}
-    .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; position:relative}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:'Inter','Noto Sans JP',sans-serif;
+      background:linear-gradient(180deg,var(--bg) 0%,#fff 100%); color:var(--ink);
+      font-size:16px;
+    }
+    .wrap{max-width:860px; margin:0 auto; padding:16px 14px calc(120px + var(--safe))}
+    .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; position:relative}
     .card::before{content:""; position:absolute; inset:0 0 auto 0; height:6px; background:linear-gradient(90deg,var(--brand-200),var(--brand-300)); border-radius:16px 16px 0 0}
-    h1{margin:10px 0 6px; font-size:clamp(22px,3.4vw,28px)}
-    .lead{color:var(--muted); margin:0 0 14px; font-size:14px}
-    .stepper{display:flex; gap:8px; align-items:center; margin:6px 0 14px}
-    .dot{width:10px; height:10px; border-radius:50%; background:#e2e8f0; border:1px solid #cbd5e1}
+    h1{margin:8px 0 4px; font-size:clamp(20px,5vw,26px)}
+    .lead{color:var(--muted); margin:0 0 12px; font-size:14px; line-height:1.6}
+    .stepper{display:flex; gap:6px; align-items:center; margin:6px 0 12px}
+    .dot{width:8px; height:8px; border-radius:50%; background:#e2e8f0; border:1px solid #cbd5e1}
     .dot.active{background:var(--brand); border-color:var(--brand)}
-    .section-title{font-weight:700; font-size:16px; margin:10px 0 12px}
-    .grid-letters{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-    .letter-box{border:1px solid var(--line); border-radius:14px; padding:14px; background:#fff}
+    .section-title{font-weight:700; font-size:17px; margin:8px 0 10px}
+    .grid-letters{display:grid; gap:12px; grid-template-columns:1fr}
+    @media (min-width:640px){ .grid-letters{grid-template-columns:repeat(2,1fr)} }
+    .letter-box{border:1px solid var(--line); border-radius:14px; padding:12px; background:#fff}
     .letter-head{display:flex; align-items:center; gap:10px; margin-bottom:10px}
     .letter-badge{display:inline-grid; place-items:center; width:28px; height:28px; border-radius:10px; background:#f1f5f9; border:1px solid #e2e8f0; font-weight:700}
-    .icon-img{width:80px; height:80px; border-radius:10px; border:1px solid #e5e7eb; background:#fff; display:inline-grid; place-items:center; overflow:hidden}
+    .icon-img{width:72px; height:72px; border-radius:10px; border:1px solid #e5e7eb; background:#fff; display:inline-grid; place-items:center; overflow:hidden}
     .icon-img img{width:100%; height:100%; object-fit:contain}
     .swatch{width:28px; height:28px; border-radius:8px; border:1px solid #e5e7eb}
-    .check{display:flex; gap:10px; align-items:flex-start; margin:8px 0}
-    .check input{margin-top:3px; width:18px; height:18px}
+
+    /* スマホ向け：チェックを大きなタップ領域に */
+    .check{
+      display:flex; gap:10px; align-items:center; margin:10px 0;
+      padding:12px; border:1px solid var(--line); border-radius:12px; background:#fff;
+      transition: border-color .15s, box-shadow .15s, background .15s;
+    }
+    .check:active{background:#fafafa}
+    /* カスタムチェックボックス（大きめ） */
+    .check input{
+      appearance:none; -webkit-appearance:none; outline:none; margin:0;
+      width:24px; height:24px; border:2px solid #cbd5e1; border-radius:8px; display:grid; place-items:center;
+      flex:0 0 24px; background:#fff;
+    }
+    .check input::after{
+      content:""; width:12px; height:12px; border-radius:4px; transform:scale(0); transition:transform .15s ease;
+      background:var(--ok);
+    }
+    .check input:checked{border-color:var(--ok)}
+    .check input:checked::after{transform:scale(1)}
+    .check span{line-height:1.5}
+
+    /* 選択中の行を強調（:has は最近のモバイルでOK） */
+    .check:has(input:checked){ border-color:rgba(16,185,129,.6); box-shadow:0 0 0 4px rgba(16,185,129,.12) }
+
     .result{display:none; margin-top:12px}
-    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:#fff; border:1px solid var(--line); margin:4px 6px 0 0; font-size:12px}
-    .summary{background:#fff; border:1px dashed var(--brand-300); border-radius:12px; padding:12px; white-space:pre-wrap; font-size:13px}
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#fff; border:1px solid var(--line); margin:4px 6px 0 0; font-size:13px}
+    .summary{background:#fff; border:1px dashed var(--brand-300); border-radius:12px; padding:12px; white-space:pre-wrap; font-size:14px; line-height:1.7}
     .hero-img{margin-top:12px; border-radius:14px; border:1px solid var(--line); overflow:hidden}
     .hero-img img{width:100%; height:auto; display:block}
-    .nav{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap}
-    .btn{cursor:pointer; min-height:44px; padding:12px 16px; border-radius:12px; border:1px solid var(--line); background:#fff; font-weight:700}
+
+    .nav{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap}
+    .btn{
+      cursor:pointer; min-height:48px; padding:14px 18px; border-radius:12px; border:1px solid var(--line); background:#fff; font-weight:700;
+      width:100%;
+    }
     .btn.primary{background:linear-gradient(180deg,var(--brand),#c57f7f); color:#fff; border-color:#c57f7f}
-    .footer-cta{position:fixed; left:0; right:0; bottom:0; padding:10px 12px; background:rgba(255,255,255,.9); border-top:1px solid var(--line); box-shadow:0 -10px 30px rgba(15,23,42,.06)}
-    .footer-cta .btn{width:100%}
-    @media (max-width:640px){.grid-letters{grid-template-columns:1fr}}
+    .btn[disabled]{opacity:.5; cursor:not-allowed}
+
+    /* 下部固定ナビ（スマホ） */
+    #navBar{
+      position:fixed; left:0; right:0; bottom:0; z-index:50;
+      background:rgba(255,255,255,.96); backdrop-filter:saturate(180%) blur(10px);
+      border-top:1px solid var(--line); box-shadow:0 -10px 30px rgba(15,23,42,.06);
+      padding:10px 12px calc(10px + var(--safe));
+    }
+    #navBar .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:860px; margin:0 auto}
+    @media (min-width:640px){ #navBar .row{grid-template-columns:160px 1fr} }
+
+    /* PC時は従来の余白で */
+    @media (min-width:960px){
+      .wrap{padding-bottom:160px}
+    }
   </style>
-  <!-- LIFF SDK（LINE送信用） -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
@@ -68,20 +115,21 @@
           <button class="btn" id="btnCopy">結果をコピー</button>
         </div>
       </div>
-
-      <div class="nav" id="navBtns">
-        <button class="btn" id="btnPrev">戻る</button>
-        <button class="btn primary" id="btnNext">次へ</button>
-      </div>
     </section>
   </main>
 
+  <!-- 下部固定ナビ（戻る／次へ or 結果を確認） -->
+  <nav id="navBar" aria-label="操作ナビ">
+    <div class="row" id="navBtns">
+      <button class="btn" id="btnPrev">戻る</button>
+      <button class="btn primary" id="btnNext" disabled>次へ</button>
+    </div>
+  </nav>
+
   <script>
     /* ===================== 設定 ===================== */
-    // A=WINTER, B=SUMMER, C=AUTUMN, D=SPRING の想定でマッピング
     const LETTER_TO_SEASON = { A: 'WINTER', B: 'SUMMER', C: 'AUTUMN', D: 'SPRING' };
 
-    // 結果ごとの大きい画像URL（差し替えてOK）
     const RESULT_IMAGES = {
       SPRING: 'https://www.dropbox.com/scl/fi/6x43wuq7lf3s3ppyfpabu/4.png?rlkey=88ju2e5c659hg8fns3u24avvg&st=0w8w8n93&dl=1',
       SUMMER: 'https://www.dropbox.com/scl/fi/9esqh65fomu9za7q43j4k/2.png?rlkey=fj29mxutr611k1j1j9j8szng6&st=1mjkkugb&dl=1',
@@ -89,7 +137,6 @@
       WINTER: 'https://www.dropbox.com/scl/fi/m1iqpihu2dr8q9b4hnru4/1.png?rlkey=ldem7h7sai3fajnw6xfkaz096&st=kxrp5bzb&dl=1',
     };
 
-    // 結果ごとの説明文（必要に応じて編集）
     const RESULT_TEXT = {
       SPRING: 'スプリング（イエベ春）\n・明るく澄んだ色、黄みのある軽やかな色が得意\n・ゴールド、コーラル、アプリコット、ミント等\n・メイクは艶と透明感、黄み寄りのベージュ系が◎',
       SUMMER : 'サマー（ブルベ夏）\n・青みを含んだやわらかい色、くすみパステルが得意\n・ローズ、ラベンダー、ブルーグレー等\n・メイクはソフトマット、ローズ〜モーブ系が◎',
@@ -97,7 +144,6 @@
       WINTER : 'ウィンター（ブルベ冬）\n・はっきり高彩度＆高コントラストが得意\n・ビビッドピンク、ロイヤルブルー、モノトーン等\n・メイクは艶×コントラスト、青みピンクやボルドーが◎',
     };
 
-    // ステップデータ（元のまま）
     const SECTIONS = [
       {
         id: 'skin',
@@ -151,179 +197,120 @@
       }
     ];
 
-    function getAllImageUrls() {
-      const urls = new Set();
-      // セクション内の画像
-      SECTIONS.forEach(sec => {
-        ['A','B','C','D'].forEach(k => {
-          const L = sec.letters[k];
-          if (L && L.img) urls.add(L.img);
-        });
-      });
-      // 結果用の大きい画像
-      Object.values(RESULT_IMAGES || {}).forEach(u => u && urls.add(u));
-      return Array.from(urls);
+    /* ========= 画像プリロード ========= */
+    function getAllImageUrls(){
+      const urls=new Set();
+      SECTIONS.forEach(sec=>['A','B','C','D'].forEach(k=>{const L=sec.letters[k]; if(L?.img) urls.add(L.img)}));
+      Object.values(RESULT_IMAGES||{}).forEach(u=>u&&urls.add(u));
+      return [...urls];
+    }
+    function preloadImages(urls,{addPreloadLinks=true}={}){
+      if(addPreloadLinks){ urls.forEach(u=>{ try{ const l=document.createElement('link'); l.rel='preload'; l.as='image'; l.href=u; document.head.appendChild(l);}catch(e){} });}
+      return Promise.all(urls.map(u=>new Promise(res=>{ const img=new Image(); img.onload=img.onerror=()=>res(); img.src=u; })));
     }
 
-    function preloadImages(urls, {addPreloadLinks = true} = {}) {
-      // rel=preload も張る（対応ブラウザで優先度アップ）
-      if (addPreloadLinks) {
-        urls.forEach(u => {
-          try {
-            const link = document.createElement('link');
-            link.rel = 'preload';
-            link.as = 'image';
-            link.href = u;
-            document.head.appendChild(link);
-          } catch(e) {}
-        });
-      }
-      // Image() で実体プリロード
-      return Promise.all(urls.map(u => new Promise(resolve => {
-        const img = new Image();
-        img.onload = img.onerror = () => resolve();
-        img.src = u;
-      })));
-    }
-
-    /* ===================== 状態 ===================== */
+    /* ========= 状態 ========= */
     const state = { step: 0, checks: loadSavedChecks() || {} };
+    let lastResultCache = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
-      // 先にプリロード開始（待っても待たなくてもOK）
-      const allUrls = getAllImageUrls();
-      const preloadPromise = preloadImages(allUrls);
-
-      // 先にUIは描画（体感を軽く）、裏でプリロード進行
+      const preloadPromise = preloadImages(getAllImageUrls());
       render();
-
-      // 可能なら初回ステップに関連する画像を優先して待機（任意）
-      try { await Promise.race([preloadPromise, new Promise(r => setTimeout(r, 800))]); } catch(e){}
-
-      // LIFF初期化（使っている場合だけ）
-      try { await initLiff(); } catch(e) {}
+      try{ await Promise.race([preloadPromise, new Promise(r=>setTimeout(r,800))]); }catch(e){}
+      try{ await initLiff(); }catch(e){}
     });
 
-    function saveChecks(){ localStorage.setItem('pc_checks', JSON.stringify(state.checks)); }
+    function saveChecks(){ try{ localStorage.setItem('pc_checks', JSON.stringify(state.checks)); }catch(e){} }
+    function loadSavedChecks(){ try{ return JSON.parse(localStorage.getItem('pc_checks')||'{}'); }catch(e){ return {}; } }
+    function clearSavedChecks(){ try{ localStorage.removeItem('pc_checks'); }catch(e){} }
 
-    function clearSavedChecks(){
-      try { localStorage.removeItem('pc_checks'); } catch(e){}
-    }
-
-    function sectionHasAnyChecked(stepIndex){
-      const sec = SECTIONS[stepIndex];
-      const secChecks = state.checks[sec.id] || {};
-      // stateベースで確認
-      for (const l of ['A','B','C','D']){
-        const idxs = secChecks[l] || {};
-        for (const k in idxs){ if (idxs[k]) return true; }
-      }
-      // 念のためDOM側も確認（state同期漏れ対策）
-      const root = document.getElementById('questionView');
-      if (root){
-        const inputs = root.querySelectorAll("input[type='checkbox']");
-        for (const el of inputs){ if (el.checked) return true; }
-      }
-      return false;
-    }
-
-    function loadSavedChecks(){
-      try{ return JSON.parse(localStorage.getItem('pc_checks')||'{}'); }catch(e){ return {}; }
-    }
-
-    /* ===================== 画面描画 ===================== */
-    function render() {
+    /* ========= UI描画 ========= */
+    function render(){
       const sec = SECTIONS[state.step];
       const root = document.getElementById('questionView');
       root.innerHTML = `<div class='section-title'>${sec.title}</div>`;
-      const grid = document.createElement('div');
-      grid.className = 'grid-letters';
+      const grid = document.createElement('div'); grid.className='grid-letters';
 
-      for (const l of ['A','B','C','D']) {
+      for(const l of ['A','B','C','D']){
         const L = sec.letters[l];
-        const box = document.createElement('div');
-        box.className = 'letter-box';
-        const head = document.createElement('div');
-        head.className = 'letter-head';
-
-        const icon = L.img
-          ? `<span class='icon-img'><img src='${L.img}' alt=''></span>`
-          : `<span class='swatch' style='background:${L.swatch}'></span>`;
-
+        const box = document.createElement('div'); box.className='letter-box';
+        const head = document.createElement('div'); head.className='letter-head';
+        const icon = L.img ? `<span class='icon-img'><img src='${L.img}' alt=''></span>` : `<span class='swatch' style='background:${L.swatch}'></span>`;
         head.innerHTML = `<span class='letter-badge'>${l}</span>${icon}`;
         box.appendChild(head);
 
-        L.items.forEach((it, i) => {
-          const id = `${sec.id}-${l}-${i}`;
-          const checked = !!(state.checks[sec.id]?.[l]?.[i]);
-          const label = document.createElement('label');
-          label.className = 'check';
+        L.items.forEach((it,i)=>{
+          const id=`${sec.id}-${l}-${i}`;
+          const checked=!!(state.checks[sec.id]?.[l]?.[i]);
+          const label=document.createElement('label'); label.className='check';
           label.innerHTML = `<input type='checkbox' id='${id}' ${checked?'checked':''}><span>${it}</span>`;
-          label.querySelector('input').addEventListener('change', (e)=>{
-            state.checks[sec.id] = state.checks[sec.id] || {};
-            state.checks[sec.id][l] = state.checks[sec.id][l] || {};
-            state.checks[sec.id][l][i] = e.target.checked;
+          const input=label.querySelector('input');
+          input.addEventListener('change',(e)=>{
+            state.checks[sec.id]=state.checks[sec.id]||{};
+            state.checks[sec.id][l]=state.checks[sec.id][l]||{};
+            state.checks[sec.id][l][i]=e.target.checked;
             saveChecks();
+            updateNextBtnState(); // 変更時に有効化/無効化
           });
           box.appendChild(label);
         });
-
         grid.appendChild(box);
       }
 
-      const isLast = state.step === SECTIONS.length - 1;
-      const nextBtn = document.getElementById('btnNext');
-      if (nextBtn) {
-        nextBtn.textContent = isLast ? '結果を確認' : '次へ';
-        nextBtn.setAttribute('aria-label', isLast ? '結果を確認' : '次へ');
-      }
       root.appendChild(grid);
       renderStepper();
+      updateNextBtnLabel();
+      updateNextBtnState();
       toggleResult(false);
     }
 
     function renderStepper(){
-      const s = document.getElementById('stepper');
-      s.innerHTML = SECTIONS.map((_, i)=>`<div class='dot ${i<=state.step?'active':''}'></div>`).join('');
+      const s=document.getElementById('stepper');
+      s.innerHTML = SECTIONS.map((_,i)=>`<div class='dot ${i<=state.step?'active':''}'></div>`).join('');
     }
 
     function toggleResult(show){
-      document.getElementById('resultView').style.display = show ? 'block' : 'none';
-      document.getElementById('questionView').style.display = show ? 'none' : 'block';
-      // ▼結果ページではナビ（戻る／次へ）を隠す
+      document.getElementById('resultView').style.display = show ? 'block':'none';
+      document.getElementById('questionView').style.display = show ? 'none':'block';
+      // 結果ページではナビを隠す
       const nav = document.getElementById('navBtns');
-      if (nav) nav.style.display = show ? 'none' : 'flex';
+      if(nav) nav.style.visibility = show ? 'hidden':'visible';
     }
 
-    /* ===================== 操作 ===================== */
-    document.getElementById('btnNext').onclick = () => {
-      // 現在のステップに1つもチェックが無ければ進行不可
-      if (!sectionHasAnyChecked(state.step)) {
-        alert('各ステップで少なくとも1つはチェックしてください。');
-        return;
-      }
+    function updateNextBtnLabel(){
+      const nextBtn=document.getElementById('btnNext');
+      const isLast = state.step === SECTIONS.length-1;
+      nextBtn.textContent = isLast ? '結果を確認' : '次へ';
+      nextBtn.setAttribute('aria-label', isLast ? '結果を確認' : '次へ');
+    }
 
-      if (state.step < SECTIONS.length - 1) {
-        state.step++;
-        render();
+    function sectionHasAnyChecked(stepIndex){
+      const sec=SECTIONS[stepIndex], secChecks=state.checks[sec.id]||{};
+      for(const l of ['A','B','C','D']){ const idxs=secChecks[l]||{}; for(const k in idxs){ if(idxs[k]) return true; } }
+      // 念のためDOMも見る
+      const inputs=document.querySelectorAll("#questionView input[type='checkbox']"); for(const el of inputs){ if(el.checked) return true; }
+      return false;
+    }
+
+    function updateNextBtnState(){
+      const nextBtn=document.getElementById('btnNext');
+      nextBtn.disabled = !sectionHasAnyChecked(state.step);
+    }
+
+    /* ========= 操作 ========= */
+    document.getElementById('btnNext').onclick = () => {
+      if (!sectionHasAnyChecked(state.step)) return; // 未選択なら進まない
+      if (state.step < SECTIONS.length - 1){
+        state.step++; render();
       } else {
-        // 最終ステップ（結果を確認）でも再チェック
-        if (!sectionHasAnyChecked(state.step)) {
-          alert('各ステップで少なくとも1つはチェックしてください。');
-          return;
-        }
-        const result = computeResult();
-        showResult(result);
+        const result = computeResult(); showResult(result);
       }
     };
-
-    document.getElementById('btnPrev').onclick = () => { if (state.step>0){ state.step--; render(); } };
+    document.getElementById('btnPrev').onclick = () => { if(state.step>0){ state.step--; render(); } };
     document.getElementById('btnRestart').onclick = () => {
-      state.step = 0;
-      state.checks = {};
-      clearSavedChecks();  // ← localStorageごと削除
-      lastResultCache = null;
-      render();
+      state.step=0; state.checks={}; clearSavedChecks(); lastResultCache=null; render();
+      // ページ先頭へ（モバイルで戻った感を出す）
+      window.scrollTo({top:0, behavior:'smooth'});
     };
 
     document.getElementById('btnCopy').onclick = () => {
@@ -337,105 +324,68 @@
       const text = buildShareText(season, letter, counts, summary);
       try{
         if (window.liff?.isLoggedIn?.()) {
-          // 可能ならシェアターゲットピッカー
           if (liff.shareTargetPicker) {
             await liff.shareTargetPicker([{ type:'text', text }, ...(image? [{type:'image', originalContentUrl:image, previewImageUrl:image}] : []) ]);
           } else {
             await liff.sendMessages([{ type:'text', text }]);
           }
           alert('LINEに送信しました。');
-        } else if (window.liff){
-          await liff.login();
-        } else {
-          alert('LINE連携（LIFF）が有効ではありません。liffIdの設定をご確認ください。');
-        }
-      }catch(e){
-        console.error(e);
-        alert('LINE送信でエラーが発生しました。コンソールを確認してください。');
-      }
+        } else if (window.liff){ await liff.login(); }
+        else { alert('LINE連携（LIFF）が有効ではありません。liffIdの設定をご確認ください。'); }
+      }catch(e){ console.error(e); alert('LINE送信でエラーが発生しました。'); }
     };
 
-    /* ===================== 判定ロジック ===================== */
-    let lastResultCache = null;
-
+    /* ========= 判定 ========= */
     function computeResult(){
-      // 各セクションで選ばれた A/B/C/D のチェック数を集計
-      const letterCounts = { A:0, B:0, C:0, D:0 };
-      const sectionByLetter = {}; // 各セクションでどれが多かったか（タイブレーク用）
-      for (const sec of SECTIONS){
-        const secChecks = state.checks[sec.id] || {};
-        const local = { A:0, B:0, C:0, D:0 };
-        for (const l of ['A','B','C','D']){
-          const idxs = secChecks[l] || {};
-          for (const k in idxs){ if (idxs[k]){ letterCounts[l]++; local[l]++; } }
-        }
-        // そのセクションで最大のレターを記録
-        const maxLocal = Math.max(local.A, local.B, local.C, local.D);
-        const winners = ['A','B','C','D'].filter(l=>local[l]===maxLocal && maxLocal>0);
-        if (winners.length){
-          winners.forEach(l=>{
-            sectionByLetter[l] = (sectionByLetter[l]||0) + 1;
-          });
-        }
+      const letterCounts={A:0,B:0,C:0,D:0}, sectionByLetter={};
+      for(const sec of SECTIONS){
+        const secChecks=state.checks[sec.id]||{}, local={A:0,B:0,C:0,D:0};
+        for(const l of ['A','B','C','D']){ const idxs=secChecks[l]||{}; for(const k in idxs){ if(idxs[k]){ letterCounts[l]++; local[l]++; } } }
+        const maxLocal=Math.max(local.A,local.B,local.C,local.D);
+        const winners=['A','B','C','D'].filter(l=>local[l]===maxLocal && maxLocal>0);
+        winners.forEach(l=>{ sectionByLetter[l]=(sectionByLetter[l]||0)+1; });
       }
-
-      // 総合最多を採用、同数なら D > B > C > A の優先
-      const order = ['D','B','C','A'];
-      let topCount = Math.max(letterCounts.A, letterCounts.B, letterCounts.C, letterCounts.D);
-      let candidate = order.find(l => letterCounts[l] === topCount) || 'D';
-
-      // さらに同数が多い場合は、勝ちセクション数でタイブレーク
-      const tiedLetters = ['A','B','C','D'].filter(l=>letterCounts[l]===topCount);
-      if (tiedLetters.length>1){
-        let best = candidate;
-        let bestScore = sectionByLetter[best]||0;
-        for (const l of tiedLetters){
-          const score = sectionByLetter[l]||0;
-          if (score>bestScore || (score===bestScore && order.indexOf(l)<order.indexOf(best))){
-            best = l; bestScore = score;
-          }
+      const order=['D','B','C','A'];
+      let topCount=Math.max(letterCounts.A,letterCounts.B,letterCounts.C,letterCounts.D);
+      let candidate=order.find(l=>letterCounts[l]===topCount)||'D';
+      const tied=['A','B','C','D'].filter(l=>letterCounts[l]===topCount);
+      if(tied.length>1){
+        let best=candidate, bestScore=sectionByLetter[best]||0;
+        for(const l of tied){ const s=sectionByLetter[l]||0;
+          if(s>bestScore || (s===bestScore && order.indexOf(l)<order.indexOf(best))){ best=l; bestScore=s; }
         }
-        candidate = best;
+        candidate=best;
       }
-
-      const season = LETTER_TO_SEASON[candidate];
-      const summary = RESULT_TEXT[season];
-      const image = RESULT_IMAGES[season];
-
-      const result = {
-        letter: candidate,
-        season,
-        counts: {...letterCounts},
-        summary,
-        image
-      };
-      lastResultCache = result;
-      return result;
+      const season=LETTER_TO_SEASON[candidate], summary=RESULT_TEXT[season], image=RESULT_IMAGES[season];
+      const result={letter:candidate, season, counts:{...letterCounts}, summary, image};
+      lastResultCache=result; return result;
     }
 
     function showResult({ season, letter, counts, summary, image }){
-      const badge = document.getElementById('typeBadge');
-      badge.textContent = `${season}（${niceJa(season)}） / 判定レター: ${letter}`;
-
-      const hero = document.getElementById('heroImg');
-      hero.innerHTML = image ? `<img src="${image}" alt="${niceJa(season)}のイメージ">` : '';
-      hero.setAttribute('aria-hidden', image ? 'false' : 'true');
-
-      const detail = [
+      document.getElementById('typeBadge').textContent = `${season}（${niceJa(season)}） / 判定レター: ${letter}`;
+      const hero=document.getElementById('heroImg');
+      if(image){
+        const img=new Image();
+        img.onload=()=>{ img.style.opacity='1'; };
+        img.style.opacity='0'; img.style.transition='opacity .25s ease';
+        img.alt=`${niceJa(season)}のイメージ`; img.src=image;
+        hero.innerHTML=''; hero.appendChild(img); hero.setAttribute('aria-hidden','false');
+      }else{
+        hero.innerHTML=''; hero.setAttribute('aria-hidden','true');
+      }
+      document.getElementById('summaryBox').textContent = [
         `A: ${counts.A} / B: ${counts.B} / C: ${counts.C} / D: ${counts.D}`,
         ``,
         summary
       ].join('\n');
-      document.getElementById('summaryBox').textContent = detail;
 
       toggleResult(true);
       renderStepper();
+      // 結果表示時は下部ナビ隠す（視覚的にも）
+      document.getElementById('navBar').style.display = 'none';
     }
 
-    function niceJa(season){
-      return { SPRING:'イエベ春', SUMMER:'ブルベ夏', AUTUMN:'イエベ秋', WINTER:'ブルベ冬' }[season] || season;
-    }
-
+    function niceJa(season){ return { SPRING:'イエベ春', SUMMER:'ブルベ夏', AUTUMN:'イエベ秋', WINTER:'ブルベ冬' }[season] || season; }
     function buildShareText(season, letter, counts, summary){
       return [
         '【パーソナルカラー診断 結果】',
@@ -448,14 +398,11 @@
       ].join('\n');
     }
 
-    /* ===================== LIFF 初期化 ===================== */
+    /* ========= LIFF ========= */
     async function initLiff(){
-      const LIFF_ID = 'YOUR_LIFF_ID'; // ← あなたのLIFF IDに置き換えてください
-      if (!LIFF_ID) return;
-      if (!window.liff) return;
-      if (!liff.isInClient && liff.init) {
-        await liff.init({ liffId: LIFF_ID });
-      }
+      const LIFF_ID='2008350729-NwPdmMA7'; // ← あなたのLIFF ID
+      if(!LIFF_ID || !window.liff) return;
+      if(!liff.isInClient && liff.init){ await liff.init({ liffId: LIFF_ID }); }
     }
   </script>
 </body>

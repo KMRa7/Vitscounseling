@@ -43,6 +43,15 @@
     .check input:checked::after{transform:scale(1)}
     .check span{line-height:1.5}
     .check:has(input:checked){ border-color:rgba(16,185,129,.6); box-shadow:0 0 0 4px rgba(16,185,129,.12) }
+    /* 数字ステッパー：タップ不可の見た目 */
+    .num:disabled,
+    .num.locked{
+      opacity:.45;
+      background:#f1f5f9;
+      color:#94a3b8;
+      border-color:#e2e8f0;
+      cursor:not-allowed;
+    }
 
     /* 結果は画像のみ表示 */
     .result{display:none; margin-top:12px}
@@ -213,8 +222,36 @@
     }
 
     function renderStepper(){
-      const s=document.getElementById('stepper');
-      s.innerHTML = SECTIONS.map((_,i)=>`<div class='dot ${i<=state.step?'active':''}'></div>`).join('');
+      const holder = document.getElementById('stepper');
+      const total = SECTIONS.length;
+      const left = document.createElement('div');
+      left.className = 'stepper-left';
+    
+      for(let i=0;i<total;i++){
+        const btn = document.createElement('button');
+        btn.type='button';
+        btn.className = 'num' + (i < state.step ? ' done' : i === state.step ? ' active' : '');
+        btn.textContent = (i+1);
+    
+        const isFuture = i > state.step;
+        btn.disabled = isFuture;                  // ← 未来は押せない
+        if (isFuture) btn.classList.add('locked'); // ← 見た目を半透明グレーに
+        btn.setAttribute('aria-label', `ステップ ${i+1}${i===state.step?'（現在地）':''}`);
+        btn.title = isFuture ? 'このステップはまだ進めません' : `ステップ ${i+1} へ移動`;
+    
+        btn.onclick = () => {
+          if (!isFuture) { state.step = i; render(); }
+        };
+        left.appendChild(btn);
+      }
+    
+      const right = document.createElement('div');
+      right.className = 'stepper-right';
+      right.textContent = `STEP ${state.step+1} / ${total}`;
+    
+      holder.innerHTML = '';
+      holder.appendChild(left);
+      holder.appendChild(right);
     }
 
     function toggleResult(show){

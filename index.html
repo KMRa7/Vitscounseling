@@ -66,11 +66,39 @@
     #navBar .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:860px; margin:0 auto}
     @media (min-width:640px){ #navBar .row{grid-template-columns:160px 1fr} }
     @media (min-width:960px){ .wrap{padding-bottom:160px} }
+
+    /* ── Intro summary ───────────────────── */
+    .intro{
+      background: linear-gradient(180deg,var(--brand-200),#fff);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      margin: 0 0 10px;
+    }
+    .intro .kicker{
+      font-weight: 700;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .intro .intro-text{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
   <main class="wrap">
     <section class="card" id="app" aria-live="polite">
+      <div class="intro" id="introSummary" role="note" aria-label="診断の説明">
+        <span class="kicker">このページは <b>パーソナルカラーの簡易診断</b> です。</span>
+        <p class="intro-text">
+          全<strong>5問</strong>（A〜Dの選択肢）にて、当てはまる項目を<strong>複数チェック可</strong>。
+          すべて回答後にタイプを自動判定し、結果画像を表示します。
+        </p>
+      </div>
       <h1>パーソナルカラー簡易診断（ステップ式）</h1>
       <p class="lead">各ステップで <b>A/B/C/D</b> の中から<strong>複数チェック可</strong>。すべて回答後にタイプ判定します。</p>
 

@@ -358,30 +358,56 @@
     document.getElementById('btnShareLine').onclick = async () => {
       await ensureLiffReady();
     
-      // 最新の判定を取得（表示済みキャッシュがあれば利用）
       const result = lastResultCache || computeResult();
       const text = buildResultText(result);
-    
       if (!text) { alert('送信するテキストを作成できませんでした。'); return; }
     
-      try{
-        if (window.liff?.isLoggedIn?.()) {
-          const messages = [{ type: 'text', text }];
+      // URLスキーム（どこからでも使える最終手段）
+      const openLineShare = (t) => {
+        const url = 'https://line.me/R/share?text=' + encodeURIComponent(t);
+        // LIFFがあれば openWindow、無ければ location.href
+        if (window.liff?.openWindow) liff.openWindow({ url, external: true });
+        else window.location.href = url;
+      };
     
-          if (liff.shareTargetPicker) {
-            await liff.shareTargetPicker(messages);
-          } else {
-            await liff.sendMessages(messages);
-          }
+      try {
+        // LIFFの起動状況
+        const inClient = !!(window.liff?.isInClient?.() || false);
+        const loggedIn = !!(window.liff?.isLoggedIn?.() || false);
+        const canSharePicker = !!(window.liff?.isApiAvailable?.('shareTargetPicker') || false);
+    
+        // 1) Share Target Picker が使えるなら最優先（外部ブラウザでも可）
+        //   ※ LINE Developersコンソールで「シェアターゲットピッカー」を有効にしておく必要あり
+        if (canSharePicker) {
+          await liff.shareTargetPicker([{ type: 'text', text }]);
           alert('結果をLINEに送信しました。');
-        } else if (window.liff) {
-          await liff.login();
-        } else {
-          alert('LINE連携（LIFF）が有効ではありません。liffIdの設定をご確認ください。');
+          return;
         }
-      } catch(e){
-        console.error(e);
-        alert('LINE送信でエラーが発生しました。');
+    
+        // 2) トーク内で開いている場合のみ sendMessages が可能
+        //    （utou:1対1 / room:複数人 / group:グループ）
+        const ctxType = window.liff?.getContext?.()?.type; // 'utou' | 'room' | 'group' | 'none'
+        const inChatContext = ctxType === 'utou' || ctxType === 'room' || ctxType === 'group';
+        if (inClient && inChatContext) {
+          if (!loggedIn) await liff.login(); // 念のため
+          await liff.sendMessages([{ type: 'text', text }]);
+          alert('結果をLINEに送信しました。');
+          return;
+        }
+    
+        // 3) それ以外（外部ブラウザなど）はURLスキームで共有画面を開く
+        openLineShare(text);
+      } catch (e) {
+        console.error('LIFF share error:', e);
+        // よくあるケース：FORBIDDEN（未対応環境/権限）や UNAUTHORIZED（未ログイン）
+        // 最後にURLスキームでリカバリー
+        try { 
+          const msg = (e && (e.message || e.code)) ? `（${e.message || e.code}）` : '';
+          console.warn('Fallback to URL scheme', msg);
+          openLineShare(text);
+        } catch {
+          alert('LINE送信でエラーが発生しました。');
+        }
       }
     };
 

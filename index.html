@@ -143,10 +143,9 @@
     };
     
     // LINEへ送るテキストを作る
-    function buildResultText({ season, letter }) {
+    function buildResultText({ season }) {
       const label = SEASON_LABELS_JA[season] || season;
-      // お好みで文面を調整してください
-      return `【${label}さん】\nあなたの診断結果は「${label}（${letter}）」でした。`;
+      return `【${label}さん】`;
     }
 
     const SECTIONS = [

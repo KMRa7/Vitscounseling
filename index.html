@@ -110,7 +110,7 @@
         <div class="hero-img" id="heroImg" aria-hidden="true"></div>
         <div class="nav">
           <button class="btn" id="btnRestart">やり直す</button>
-          <button class="btn primary" id="btnShareLine">結果画像をLINEで送る</button>
+          <button class="btn primary" id="btnShareLine">結果をLINEで送る</button>
         </div>
       </div>
     </section>
@@ -133,6 +133,21 @@
       AUTUMN: 'https://www.dropbox.com/scl/fi/d4e2z1y2z1s0fzohkrz9c/3.png?rlkey=lcg5lv3z6dcqxi16edcdibgsi&dl=1',
       WINTER: 'https://www.dropbox.com/scl/fi/m1iqpihu2dr8q9b4hnru4/1.png?rlkey=ldem7h7sai3fajnw6xfkaz096&dl=1',
     };
+
+    // 季節 → 日本語表示（ブルベ/イエベ）
+    const SEASON_LABELS_JA = {
+      SPRING: 'イエベ春',
+      SUMMER: 'ブルベ夏',
+      AUTUMN: 'イエベ秋',
+      WINTER: 'ブルベ冬',
+    };
+    
+    // LINEへ送るテキストを作る
+    function buildResultText({ season, letter }) {
+      const label = SEASON_LABELS_JA[season] || season;
+      // お好みで文面を調整してください
+      return `【${label}さん】\nあなたの診断結果は「${label}（${letter}）」でした。`;
+    }
 
     const SECTIONS = [
       { id:'skin', title:'Ⅰ 肌の色・印象は？',
@@ -342,19 +357,32 @@
 
     document.getElementById('btnShareLine').onclick = async () => {
       await ensureLiffReady();
-      const { image } = lastResultCache || computeResult();
-      if (!image){ alert('画像が用意できませんでした。'); return; }
+    
+      // 最新の判定を取得（表示済みキャッシュがあれば利用）
+      const result = lastResultCache || computeResult();
+      const text = buildResultText(result);
+    
+      if (!text) { alert('送信するテキストを作成できませんでした。'); return; }
+    
       try{
         if (window.liff?.isLoggedIn?.()) {
+          const messages = [{ type: 'text', text }];
+    
           if (liff.shareTargetPicker) {
-            await liff.shareTargetPicker([{ type:'image', originalContentUrl:image, previewImageUrl:image }]);
+            await liff.shareTargetPicker(messages);
           } else {
-            await liff.sendMessages([{ type:'image', originalContentUrl:image, previewImageUrl:image }]);
+            await liff.sendMessages(messages);
           }
-          alert('結果画像をLINEに送信しました。');
-        } else if (window.liff){ await liff.login(); }
-        else { alert('LINE連携（LIFF）が有効ではありません。liffIdの設定をご確認ください。'); }
-      }catch(e){ console.error(e); alert('LINE送信でエラーが発生しました。'); }
+          alert('結果をLINEに送信しました。');
+        } else if (window.liff) {
+          await liff.login();
+        } else {
+          alert('LINE連携（LIFF）が有効ではありません。liffIdの設定をご確認ください。');
+        }
+      } catch(e){
+        console.error(e);
+        alert('LINE送信でエラーが発生しました。');
+      }
     };
 
     /* ========= 判定（画像のみ返す） ========= */

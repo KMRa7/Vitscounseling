@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>パーソナルカラー簡易診断｜ステップ式</title>
+  <title>かんたんパーソナルカラー診断｜ステップ式</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -43,17 +43,9 @@
     .check input:checked::after{transform:scale(1)}
     .check span{line-height:1.5}
     .check:has(input:checked){ border-color:rgba(16,185,129,.6); box-shadow:0 0 0 4px rgba(16,185,129,.12) }
-    /* 数字ステッパー：タップ不可の見た目 */
     .num:disabled,
-    .num.locked{
-      opacity:.45;
-      background:#f1f5f9;
-      color:#94a3b8;
-      border-color:#e2e8f0;
-      cursor:not-allowed;
-    }
+    .num.locked{ opacity:.45; background:#f1f5f9; color:#94a3b8; border-color:#e2e8f0; cursor:not-allowed; }
 
-    /* 結果は画像のみ表示 */
     .result{display:none; margin-top:12px}
     .hero-img{margin-top:12px; border-radius:14px; border:1px solid var(--line); overflow:hidden}
     .hero-img img{width:100%; height:auto; display:block}
@@ -67,65 +59,44 @@
     @media (min-width:640px){ #navBar .row{grid-template-columns:160px 1fr} }
     @media (min-width:960px){ .wrap{padding-bottom:160px} }
 
-    /* ── Intro summary ───────────────────── */
-    .intro{
-      background: linear-gradient(180deg,var(--brand-200),#fff);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px;
-      margin: 0 0 10px;
-    }
-    .intro .kicker{
-      font-weight: 700;
-      font-size: 14px;
-      display: block;
-      margin-bottom: 4px;
-    }
-    .intro .intro-text{
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 14px;
-    }
+    .intro{ background: linear-gradient(180deg,var(--brand-200),#fff); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin: 0 0 10px; }
+    .intro .kicker{ font-weight: 700; font-size: 14px; display: block; margin-bottom: 4px; }
+    .intro .intro-text{ margin: 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
   </style>
 </head>
 <body>
   <main class="wrap">
     <section class="card" id="app" aria-live="polite">
       <div class="intro" id="introSummary" role="note" aria-label="診断の説明">
-        <span class="kicker">このページは <b>パーソナルカラーの簡易診断</b> です。</span>
+        <span class="kicker">ここでは <b>かんたんパーソナルカラー診断</b> ができます。</span>
         <p class="intro-text">
-          全<strong>5問</strong>（A〜Dの選択肢）にて、当てはまる項目を<strong>複数チェック可</strong>。
-          すべて回答後にタイプを自動判定し、結果画像を表示します。
+          全<strong>5問</strong>、A〜Dの中から<strong>当てはまると思う項目にチェック！何個でもOK</strong>。すべて答えるとタイプを自動判定して、結果画像をお届けします。
         </p>
       </div>
-      <h1>パーソナルカラー簡易診断（ステップ式）</h1>
-      <p class="lead">各ステップで <b>A/B/C/D</b> の中から<strong>複数チェック可</strong>。すべて回答後にタイプ判定します。</p>
+      <h1>かんたんパーソナルカラー診断（ステップ式）</h1>
+      <p class="lead">各ステップで <b>A/B/C/D</b> から<strong>「ぴったり」だと思うものにチェック</strong>。いくつでもOK。全部答えるとタイプを判定します。</p>
 
       <div class="stepper" id="stepper"></div>
       <div id="questionView"></div>
 
-      <!-- 結果は画像のみ -->
       <div class="result" id="resultView">
         <div class="hero-img" id="heroImg" aria-hidden="true"></div>
         <div class="nav">
-          <button class="btn" id="btnRestart">やり直す</button>
+          <button class="btn" id="btnRestart">はじめから</button>
           <button class="btn primary" id="btnShareLine">結果をLINEで送る</button>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- 下部固定ナビ -->
   <nav id="navBar" aria-label="操作ナビ">
     <div class="row" id="navBtns">
-      <button class="btn" id="btnPrev">戻る</button>
-      <button class="btn primary" id="btnNext" disabled>次へ</button>
+      <button class="btn" id="btnPrev">もどる</button>
+      <button class="btn primary" id="btnNext" disabled>つぎへ</button>
     </div>
   </nav>
 
   <script>
-    /* ===================== 設定 ===================== */
     const LETTER_TO_SEASON = { A: 'WINTER', B: 'SUMMER', C: 'AUTUMN', D: 'SPRING' };
     const RESULT_IMAGES = {
       SPRING: 'https://www.dropbox.com/scl/fi/6x43wuq7lf3s3ppyfpabu/4.png?rlkey=88ju2e5c659hg8fns3u24avvg&dl=1',
@@ -134,22 +105,20 @@
       WINTER: 'https://www.dropbox.com/scl/fi/m1iqpihu2dr8q9b4hnru4/1.png?rlkey=ldem7h7sai3fajnw6xfkaz096&dl=1',
     };
 
-    // 季節 → 日本語表示（ブルベ/イエベ）
     const SEASON_LABELS_JA = {
       SPRING: 'イエベ春',
       SUMMER: 'ブルベ夏',
       AUTUMN: 'イエベ秋',
       WINTER: 'ブルベ冬',
     };
-    
-    // LINEへ送るテキストを作る
+
     function buildResultText({ season }) {
       const label = SEASON_LABELS_JA[season] || season;
       return `【${label}さん】`;
     }
 
     const SECTIONS = [
-      { id:'skin', title:'Ⅰ 肌の色・印象は？',
+      { id:'skin', title:'Ⅰ 肌の色・印象はどれに近い？',
         letters:{
           A:{ swatch:'#f2d7c3', items:['色白、ほおの赤みが少ない','やや赤みを帯びている','ツヤがある','メナードのファンデーション 22・23・51・52を使用'] },
           B:{ swatch:'#f3c7c3', items:['ピンクベージュ、ピンクみを帯びている','透けるように白い','ツヤが少ない、パウダリーな印象','メナードのファンデーション 22・23・51・52を使用'] },
@@ -157,10 +126,10 @@
           D:{ swatch:'#e8dcd1', items:['アイボリーベージュ、黄みがある','小麦肌、ツヤがある','血色がよい、ほほが赤くなりやすい','メナードのファンデーション 41・41Y・44・52Yを使用'] }
         }
       },
-      { id:'beigegray', title:'Ⅱ ベージュとグレーの洋服で得意なのは？',
+      { id:'beigegray', title:'Ⅱ ベージュとグレーの服、似合うのはどっち？',
         letters:{
-          A:{ img:'https://www.dropbox.com/scl/fi/f45scwhiw1joxcowsg22g/1.png?rlkey=ohm9bn5end0hzocu3ctman2o7&dl=1', items:['ダークなグレー（顔の印象をはっきりと見せる'] },
-          B:{ img:'https://www.dropbox.com/scl/fi/0roqzj9g4cadbc7d79c4s/2.png?rlkey=gp833m25rql6cavmt3i9a3vnw&dl=1', items:['明るいグレーや青みの強いグレー（肌がキレイに見える）'] },
+          A:{ img:'https://www.dropbox.com/scl/fi/f45scwhiw1joxcowsg22g/1.png?rlkey=ohm9bn5end0hzocu3ctman2o7&dl=1', items:['ダークなグレー（顔の印象をはっきり見せる）'] },
+          B:{ img:'https://www.dropbox.com/scl/fi/0roqzj9g4cadbc7d79c4s/2.png?rlkey=gp833m25rql6cavmt3i9a3vnw&dl=1', items:['明るいグレーや青みの強いグレー（肌がきれいに見える）'] },
           C:{ img:'https://www.dropbox.com/scl/fi/6gn3quc7n0tuepa3yjtht/3.png?rlkey=r94s81ov3cxq93o4n0q8j9ujo&dl=1', items:['落ち着いたベージュやブラウン（地味になったり老けたりしない）'] },
           D:{ img:'https://www.dropbox.com/scl/fi/88bit1bexy12jwjy6vtz1/4.png?rlkey=m0j9ykut4940c7b85o2qmr2c1&dl=1', items:['明るいベージュ（顔色が良く見える）'] }
         }
@@ -169,7 +138,7 @@
         letters:{
           A:{ img:'https://www.dropbox.com/scl/fi/0usq54wcnquoxgk34kcp1/1.jpg?rlkey=1am5x4y7igg2sur5sfkd98p8d&dl=1', items:['瞳はブラックやダークブラウン','白目と黒目のコントラストがはっきりしている','キリっとした印象の目'] },
           B:{ img:'https://www.dropbox.com/scl/fi/9gtol6hril375v7tc9rwk/2.jpg?rlkey=81p9ej8dwhvc8g41r6bqdf259&dl=1', items:['瞳はソフトなブラックやソフトなブラウン','白目と黒目のコントラストは強くない','落ち着いた印象の目'] },
-          C:{ img:'https://www.dropbox.com/scl/fi/hei8cgewx19dhlyqcky2c/3.jpg?rlkey=wc1crb3lzazmtxhgmencjpjxm&dl=1', items:['瞳はダークブラウンやブラック','白目はやや黄みが買っている','落ち着いた印象の目'] },
+          C:{ img:'https://www.dropbox.com/scl/fi/hei8cgewx19dhlyqcky2c/3.jpg?rlkey=wc1crb3lzazmtxhgmencjpjxm&dl=1', items:['瞳はダークブラウンやブラック','白目はやや黄みがかっている','落ち着いた印象の目'] },
           D:{ img:'https://www.dropbox.com/scl/fi/c0zzki09knylcuuruc9q0/4.jpg?rlkey=485y6gnvfm42na79txf9z5ew2&dl=1', items:['瞳は明るいブラウンやソフトなブラック','白目と黒目の印象がはっきりしている','キラキラとした印象の目'] }
         }
       },
@@ -191,7 +160,6 @@
       }
     ];
 
-    /* ========= 軽量プリロード（現在＋次のみ） ========= */
     function preloadSectionImages(step){
       const sec = SECTIONS[step]; if(!sec) return;
       const urls = [];
@@ -203,7 +171,6 @@
       if('requestIdleCallback' in window){ requestIdleCallback(run, {timeout:1200}); } else { setTimeout(run, 400); }
     }
 
-    /* ========= 状態 ========= */
     const state = { step: 0, checks: loadSavedChecks() || {} };
     let lastResultCache = null;
 
@@ -217,7 +184,6 @@
     function loadSavedChecks(){ try{ return JSON.parse(localStorage.getItem('pc_checks')||'{}'); }catch(e){ return {}; } }
     function clearSavedChecks(){ try{ localStorage.removeItem('pc_checks'); }catch(e){} }
 
-    /* ========= UI描画 ========= */
     function render(){
       const sec = SECTIONS[state.step];
       const root = document.getElementById('questionView');
@@ -276,8 +242,8 @@
         btn.textContent = (i+1);
     
         const isFuture = i > state.step;
-        btn.disabled = isFuture;                  // ← 未来は押せない
-        if (isFuture) btn.classList.add('locked'); // ← 見た目を半透明グレーに
+        btn.disabled = isFuture;
+        if (isFuture) btn.classList.add('locked');
         btn.setAttribute('aria-label', `ステップ ${i+1}${i===state.step?'（現在地）':''}`);
         btn.title = isFuture ? 'このステップはまだ進めません' : `ステップ ${i+1} へ移動`;
     
@@ -306,8 +272,8 @@
     function updateNextBtnLabel(){
       const nextBtn=document.getElementById('btnNext');
       const isLast = state.step === SECTIONS.length-1;
-      nextBtn.textContent = isLast ? '結果を確認' : '次へ';
-      nextBtn.setAttribute('aria-label', isLast ? '結果を確認' : '次へ');
+      nextBtn.textContent = isLast ? '結果を見る' : 'つぎへ';
+      nextBtn.setAttribute('aria-label', isLast ? '結果を見る' : 'つぎへ');
     }
 
     function sectionHasAnyChecked(stepIndex){
@@ -322,7 +288,6 @@
       nextBtn.disabled = !sectionHasAnyChecked(state.step);
     }
 
-    /* ========= 操作 ========= */
     document.getElementById('btnNext').onclick = () => {
       if (!sectionHasAnyChecked(state.step)) return;
       if (state.step < SECTIONS.length - 1){
@@ -340,10 +305,9 @@
       window.scrollTo({top:0, behavior:'smooth'});
     };
 
-    /* ========= LIFF（画像のみ送信） ========= */
     async function ensureLiffReady(){
       if (!window.liff) await loadScript('https://static.line-scdn.net/liff/edge/2/sdk.js');
-      const LIFF_ID='2008350729-NwPdmMA7'; // ←必要に応じて置き換え
+      const LIFF_ID='2008350729-NwPdmMA7';
       if (liff && !liff._initCalled && LIFF_ID){
         try{ await liff.init({ liffId: LIFF_ID }); }catch(e){}
       }
@@ -361,45 +325,35 @@
       const text = buildResultText(result);
       if (!text) { alert('送信するテキストを作成できませんでした。'); return; }
     
-      // URLスキーム（どこからでも使える最終手段）
       const openLineShare = (t) => {
         const url = 'https://line.me/R/share?text=' + encodeURIComponent(t);
-        // LIFFがあれば openWindow、無ければ location.href
         if (window.liff?.openWindow) liff.openWindow({ url, external: true });
         else window.location.href = url;
       };
     
       try {
-        // LIFFの起動状況
         const inClient = !!(window.liff?.isInClient?.() || false);
         const loggedIn = !!(window.liff?.isLoggedIn?.() || false);
         const canSharePicker = !!(window.liff?.isApiAvailable?.('shareTargetPicker') || false);
     
-        // 1) Share Target Picker が使えるなら最優先（外部ブラウザでも可）
-        //   ※ LINE Developersコンソールで「シェアターゲットピッカー」を有効にしておく必要あり
         if (canSharePicker) {
           await liff.shareTargetPicker([{ type: 'text', text }]);
-          alert('結果をLINEに送信しました。');
+          alert('結果をLINEに送りました。');
           return;
         }
-    
-        // 2) トーク内で開いている場合のみ sendMessages が可能
-        //    （utou:1対1 / room:複数人 / group:グループ）
-        const ctxType = window.liff?.getContext?.()?.type; // 'utou' | 'room' | 'group' | 'none'
+
+        const ctxType = window.liff?.getContext?.()?.type;
         const inChatContext = ctxType === 'utou' || ctxType === 'room' || ctxType === 'group';
         if (inClient && inChatContext) {
-          if (!loggedIn) await liff.login(); // 念のため
+          if (!loggedIn) await liff.login();
           await liff.sendMessages([{ type: 'text', text }]);
-          alert('結果をLINEに送信しました。');
+          alert('結果をLINEに送りました。');
           return;
         }
-    
-        // 3) それ以外（外部ブラウザなど）はURLスキームで共有画面を開く
+
         openLineShare(text);
       } catch (e) {
         console.error('LIFF share error:', e);
-        // よくあるケース：FORBIDDEN（未対応環境/権限）や UNAUTHORIZED（未ログイン）
-        // 最後にURLスキームでリカバリー
         try { 
           const msg = (e && (e.message || e.code)) ? `（${e.message || e.code}）` : '';
           console.warn('Fallback to URL scheme', msg);
@@ -410,7 +364,6 @@
       }
     };
 
-    /* ========= 判定（画像のみ返す） ========= */
     function computeResult(){
       const letterCounts={A:0,B:0,C:0,D:0}, sectionByLetter={};
       for(const sec of SECTIONS){
